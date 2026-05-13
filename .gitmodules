@@ -1,0 +1,3 @@
+[submodule "RD-Agent"]
+	path = RD-Agent
+	url = https://github.com/microsoft/RD-Agent
