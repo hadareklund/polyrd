@@ -20,14 +20,14 @@ Specializing [RD-Agent](https://github.com/microsoft/RD-Agent) for [Polymarket](
 
 ---
 
-## Phase 1 — Eval Hardening & Primitives
+## Phase 1 — Eval Hardening & Primitives ✓
 **Goal:** Harden the eval harness with a leakage guard and define the canonical variable set — every future factor runs through this before entering the catalog.
 
-- [ ] `rdagent/scenarios/polymarket/factor/eval.py` — add **leakage guard**: reject any factor that reads snapshot columns timestamped within 1h of `end_date`; static check enforced at eval time before IC is computed
-- [ ] `test/polymarket/test_factor_eval.py` — extend existing tests (currently 15/15): add leakage guard assertions (synthetic leaky factor is rejected, clean factor passes); add warning assertion when < 20 markets survive the liquidity filter
-- [ ] `rdagent/scenarios/polymarket/data/variables.py` — define `ALPHA_POLY` canonical variable set: `compute_features(market_df, snapshot_df) -> pd.DataFrame` returning rolling windows (1h, 4h, 24h, 7d) on `mid`, `spread`, `volume`, `depth_5pct`, `num_trades`, `days_to_end`; all baseline and LLM-generated factors reference these primitives
+- [x] `rdagent/scenarios/polymarket/factor/eval.py` — `LeakageError` + `check_leakage()`: rejects snapshots with data within 1h of `end_date`; `evaluate_factor()` emits `UserWarning` when < 20 markets pass the liquidity filter
+- [x] `test/polymarket/test_factor_eval.py` — extended to 37/37 offline tests: leakage guard (leaky rejected, clean passes, cutoff boundary), liquidity warning, ALPHA_POLY feature tests
+- [x] `rdagent/scenarios/polymarket/data/variables.py` — `compute_features(market_df, snapshot_df, as_of) -> pd.DataFrame`: rolling (1h, 4h, 24h, 7d) mean/std/last for `mid`, `spread`, `volume`, `depth_5pct`, `num_trades` + `days_to_end`
 
-**Verify:** `pytest test/polymarket/ -m offline` — all pass; synthetic leaky factor is rejected by the guard.
+**Verify:** `pytest test/polymarket/ -m offline` — 37/37 pass; leaky snapshot raises `LeakageError`.
 
 ---
 
