@@ -4,19 +4,19 @@ Specializing [RD-Agent](https://github.com/microsoft/RD-Agent) for [Polymarket](
 
 ---
 
-## Phase 0 — Foundation
+## Phase 0 — Foundation ✓
 **Goal:** One working end-to-end R&D loop with real Polymarket data.
 
-- [ ] `rdagent/scenarios/polymarket/data/schema.py` — typed dataclasses for Gamma API markets, CLOB trade history, order book snapshots
-- [ ] `rdagent/scenarios/polymarket/data/loader.py` — paginated fetch from Gamma + CLOB REST APIs, parquet cache partitioned by `category/date`
-- [ ] `rdagent/scenarios/polymarket/data/cache.py` — read/write helpers, staleness checks, offline fallback
-- [ ] `test/polymarket/test_data_loader.py` — schema validation against mock responses (offline, no API key needed)
-- [ ] `rdagent/scenarios/polymarket/conf.py` — `PolymarketConf(BaseSettings)` for API keys, data paths, category filter
-- [ ] `rdagent/scenarios/polymarket/scen.py` — `PolymarketScenario(Scenario)`
-- [ ] `rdagent/scenarios/polymarket/factor/exp.py` — `PolymarketFactorTask`, `PolymarketFactorExperiment`
-- [ ] `rdagent/scenarios/polymarket/factor/eval.py` — IC, ICIR, Brier score, win rate per category with liquidity filter
-- [ ] `rdagent/app/polymarket/loop.py` — `PolymarketFactorLoop(LoopBase)`: propose → code → run → evaluate → feedback
-- [ ] `rdagent/app/polymarket/factor.py` + register `rdagent poly_factor` in `rdagent/app/cli.py`
+- [x] `rdagent/scenarios/polymarket/data/schema.py` — typed dataclasses for Gamma API markets, CLOB trade history, order book snapshots
+- [x] `rdagent/scenarios/polymarket/data/loader.py` — paginated fetch from Gamma + CLOB REST APIs, parquet cache partitioned by `category/date`
+- [x] `rdagent/scenarios/polymarket/data/cache.py` — read/write helpers, staleness checks, offline fallback
+- [x] `test/polymarket/test_data_loader.py` — schema validation against mock responses (28/28 offline tests passing)
+- [x] `rdagent/scenarios/polymarket/conf.py` — `PolymarketConf(BaseSettings)` for API keys, data paths, category filter
+- [x] `rdagent/scenarios/polymarket/scen.py` — `PolymarketScenario(Scenario)`
+- [x] `rdagent/scenarios/polymarket/factor/exp.py` — `PolymarketFactorTask`, `PolymarketFactorExperiment`
+- [x] `rdagent/scenarios/polymarket/factor/eval.py` — IC, ICIR, Brier score, win rate per category with liquidity filter
+- [x] `rdagent/app/polymarket/loop.py` — `PolymarketFactorRDLoop(RDLoop)`: propose → code → run → evaluate → feedback
+- [x] `rdagent poly_factor` registered in `rdagent/app/cli.py` (entry point in `loop.py`; no separate `factor.py` needed)
 
 ## Phase 1 — Factor Library Bootstrap
 **Goal:** 10–20 hand-crafted baseline factors to seed the LLM knowledge base.
