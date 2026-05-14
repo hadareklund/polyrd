@@ -20,7 +20,18 @@ cd RD-Agent
 make dev
 ```
 
-Configuration is loaded from a `.env` file in `RD-Agent/`. Copy `RD-Agent/.env.example` to `RD-Agent/.env` and fill in at minimum `CHAT_MODEL`, `EMBEDDING_MODEL`, and the corresponding API keys. Run `rdagent health_check` to validate the LLM setup.
+Configuration is loaded from a `.env` file in `RD-Agent/`. Copy `RD-Agent/.env.example` to `RD-Agent/.env`. The active `.env` is pre-configured with:
+- **Chat**: DeepSeek (`deepseek/deepseek-chat` via `https://api.deepseek.com/v1`)
+- **Embeddings**: Qwen3-Embedding-4B served locally via `scripts/embed_proxy.py` on port 8009
+
+**Before running any R&D loop command**, start the embedding proxy (model loads from local cache in ~5s):
+
+```bash
+conda run -n quantaalpha python scripts/embed_proxy.py
+# Starts on http://localhost:8009/v1 — leave running in a separate terminal
+```
+
+Run `rdagent health_check` to validate the full LLM setup once the proxy is up.
 
 ## Common Commands
 
@@ -188,12 +199,22 @@ The framework below is inherited unchanged. Build on top of it, do not modify co
 
 ### LLM backend
 
-All LLM calls go through `RD-Agent/rdagent/oai/`, which wraps LiteLLM. Configure via `RD-Agent/.env`:
+All LLM calls go through `RD-Agent/rdagent/oai/`, which wraps LiteLLM. The active config in `RD-Agent/.env`:
 
 ```bash
-CHAT_MODEL=gpt-4o
-EMBEDDING_MODEL=text-embedding-3-small
-OPENAI_API_KEY=<key>
+# Chat — DeepSeek (OpenAI-compatible)
+CHAT_MODEL=deepseek/deepseek-chat
+OPENAI_API_BASE=https://api.deepseek.com/v1
+OPENAI_API_KEY=<in .env>
+
+# Embeddings — Qwen3-Embedding-4B via local proxy
+EMBEDDING_MODEL=litellm_proxy/Qwen3-Embedding-4B
+LITELLM_PROXY_API_KEY=local
+LITELLM_PROXY_API_BASE=http://localhost:8009/v1
+# Proxy: conda run -n quantaalpha python scripts/embed_proxy.py
+# Model cached at: ~/.cache/huggingface/hub/models--Qwen--Qwen3-Embedding-4B
+
+# Polymarket / Alchemy keys also in .env (gitignored)
 ```
 
 ## File Naming Conventions
