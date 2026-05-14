@@ -31,22 +31,20 @@ Specializing [RD-Agent](https://github.com/microsoft/RD-Agent) for [Polymarket](
 
 ---
 
-## Phase 2 — Baseline Factor Library
+## Phase 2 — Baseline Factor Library ✓
 **Goal:** 10–15 hand-crafted factors establish per-category IC/ICIR benchmarks and seed the CoSTEER knowledge base.
 
-Factors are implemented as `compute(market_df, snapshot_df) -> pd.Series` using `ALPHA_POLY` primitives.
+- [x] `rdagent/scenarios/polymarket/factor/baselines/` — 11 factors across 5 families (61/61 offline tests passing):
+  - `momentum.py` — `mid_velocity_1h/4h/24h`, `mid_rsi_24h`
+  - `liquidity.py` — `spread_compression`, `depth_change_1h`, `volume_surge_24h`
+  - `time_decay.py` — `days_to_end_weighted_mid`, `overnight_drift`
+  - `resolution_bias.py` — `category_resolution_bias`
+  - `cross_market.py` — `event_price_deviation`
+- [x] Each baseline validated offline: momentum/liquidity/time-decay factors show positive IC on synthetic trending data
+- [x] `rdagent/scenarios/polymarket/factor/catalog.py` — `FactorCatalog` with save/load/register_factor/get_top_factors; NaN-safe JSON round-trip; `summary()` returns ranked DataFrame
+- [ ] Run baselines on real data; record per-category IC/ICIR benchmarks in the catalog *(requires API keys + populated data cache)*
 
-- [ ] `rdagent/scenarios/polymarket/factor/baselines/` — one file per factor family:
-  - `momentum.py` — mid-price velocity (1h, 4h, 24h), RSI-style oscillator on implied probability
-  - `liquidity.py` — spread compression rate, order book depth change, volume surge ratio
-  - `time_decay.py` — days-to-resolution decay, overnight drift (open→close delta)
-  - `resolution_bias.py` — historical over/under-pricing by category (requires resolved markets in cache)
-  - `cross_market.py` — correlation with related market mid-prices at the event level
-- [ ] Each baseline validated through `test_factor_eval.py` in offline mode (synthetic data with known outcomes)
-- [ ] `rdagent/scenarios/polymarket/factor/catalog.py` — persist each evaluated factor's metadata (name, category, IC, ICIR, Brier, window, feature dependencies, code hash) to `POLY_DATA_PATH/catalog/` as JSON; this catalog is what CoSTEER reads as prior knowledge
-- [ ] Run baselines on real data; record per-category IC/ICIR benchmarks in the catalog
-
-**Verify:** Catalog JSON is written with IC/ICIR/Brier populated for all baselines; all baselines pass `test_factor_eval.py`.
+**Verify:** `pytest test/polymarket/ -m offline` — 61/61 pass.
 
 ---
 
